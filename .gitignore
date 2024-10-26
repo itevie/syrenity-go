@@ -1,2 +1,4 @@
 /go.sum
 /files/**/*.*
+/client/node_modules
+/client/build
