@@ -32,6 +32,24 @@ func RegisterChannelRoutes(router *gin.RouterGroup, db *sqlx.DB, ws *socket.Webs
 		c.JSON(http.StatusOK, channel)
 	})
 
+	router.GET("/channels/:channel_id/messages", func(c *gin.Context) {
+		channel_id, _ := strconv.Atoi(c.Param("channel_id"))
+
+		messages, err := models.MessageQuery{
+			Amount:    20,
+			ChannelID: channel_id,
+		}.Query(db)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, models.ErrorMessage{
+				Message: err.Error(),
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, messages)
+	})
+
 	router.POST("/channels/:channel_id/messages", func(c *gin.Context) {
 		channel_id, _ := strconv.Atoi(c.Param("channel_id"))
 

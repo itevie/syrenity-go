@@ -1,9 +1,12 @@
 package models
 
 import (
+	"database/sql"
 	"fmt"
 	"strings"
 	"time"
+
+	"math/rand"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -20,6 +23,12 @@ type User struct {
 	Email           *string   `db:"email" json:"email"`
 	EmailVerified   bool      `db:"email_verified" json:"email_verified"`
 	CreatedAt       time.Time `db:"created_at" json:"created_at"`
+}
+
+func (user User) CanViewServer(serverId string, db *sqlx.DB) bool {
+	var member Member
+	err := db.QueryRowx("SELECT * FROM members WHERE user_id = $1 AND guild_id = $2;", user.ID, serverId).StructScan(&member)
+	return err == nil && err != sql.ErrNoRows
 }
 
 func UserFromAuth(db *sqlx.DB, t string, w *User) error {
@@ -39,4 +48,9 @@ func UserFromAuth(db *sqlx.DB, t string, w *User) error {
 	}
 
 	return nil
+}
+
+func RandomDiscriminator() string {
+	var number = rand.Intn(10000)
+	return fmt.Sprintf("%04d", number)
 }

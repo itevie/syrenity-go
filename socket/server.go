@@ -3,6 +3,7 @@ package socket
 
 import (
 	"fmt"
+	"strings"
 	"syrenity/server/models"
 
 	"github.com/gorilla/websocket"
@@ -74,6 +75,10 @@ func (s *WebsocketServer) Run() {
 
 func (s *WebsocketServer) HandleMessage(message Message) {
 	for client := range s.clients {
+		if !strings.HasPrefix(message.Type, "Dispatch") && client.User == nil {
+			continue
+		}
+
 		select {
 		case client.send <- message:
 		default:

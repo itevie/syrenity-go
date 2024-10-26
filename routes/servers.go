@@ -17,6 +17,7 @@ func RegisterServerRoutes(router *gin.RouterGroup, db *sqlx.DB) {
 		err := db.QueryRowx("SELECT * FROM guilds WHERE id = $1;", id).StructScan(&server)
 
 		if err != nil {
+			fmt.Println(err)
 			c.JSON(http.StatusInternalServerError, models.ErrorMessage{
 				Message: "Failed to fetch server",
 			})

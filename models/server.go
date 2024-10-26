@@ -1,7 +1,7 @@
 package models
 
 type Server struct {
-	Id           int     `db:"id" json:"id"`
+	ID           int     `db:"id" json:"id"`
 	Name         string  `db:"name" json:"name"`
 	OwnerId      int     `db:"owner_id" json:"owner_id"`
 	Description  *string `db:"description" json:"description"`

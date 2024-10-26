@@ -21,20 +21,32 @@ func main() {
 	go websocketServer.Run()
 
 	router := gin.Default()
+	root := router.Group("/")
+	{
+		routes.RegisterCDNRoutes(root, db)
 
-	router.GET("/ws", func(c *gin.Context) {
-		socket.Serve(c, websocketServer, db)
-	})
+		router.Use(middleware.CORSMiddleware())
+
+		router.GET("/ws", func(c *gin.Context) {
+			socket.Serve(c, websocketServer, db)
+		})
+	}
 
 	api := router.Group("/api")
-	api.Use(middleware.RequireToken(db))
 	{
+		api.Use(middleware.RequireToken(db))
+		api.Use(middleware.ValidateParams(db))
+		api.Use(middleware.CORSMiddleware())
+
 		routes.RegisterUserRoutes(api, db)
 		routes.RegisterServerRoutes(api, db)
 		routes.RegisterChannelRoutes(api, db, websocketServer)
 	}
 
-	router.Use((middleware.ValidateParams(db)))
+	auth := router.Group("/auth")
+	{
+		routes.RegisterAuthRoutes(auth, db)
+	}
 
 	router.Run(":3000")
 }
